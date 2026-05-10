@@ -34,7 +34,7 @@ app.use(express.json())
 app.use(cookieParser()) //token in cookie - correctly
 
 app.get("/", (req, res)=>{
-    res.json({message: "ExamNotes AI Backend Running "})
+    res.json({message: "NeevAI Backend Running "})
 })
 
 app.use("/api/auth" , authRouter) 
