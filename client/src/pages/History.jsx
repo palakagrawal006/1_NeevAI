@@ -48,7 +48,7 @@ function History() {
     try {
       const res = await axios.get(`${serverUrl}/api/notes/${notesId}`, {withCredentials: true})
 
-      console.log("SELECTED NOTE:", res.data.content)
+      // console.log("SELECTED NOTE:", res.data.content)
 
       setSelectedNote(res.data.content)
       setLoading(false)
