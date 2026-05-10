@@ -24,7 +24,7 @@ function History() {
     const myNotes = async()=>{
       try {
         const res = await axios.get(`${serverUrl}/api/notes/getnotes`, {withCredentials: true})
-        console.log(res.data) ; 
+        // console.log(res.data) ; 
 
         setTopics(Array.isArray(res.data)? res.data: [] )
 
