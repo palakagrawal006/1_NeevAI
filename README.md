@@ -127,5 +127,5 @@ ExamNotesAI/
 
 ## 👤 Author
 
-**PalaK Agrawal**  
+**Palak Agrawal**  
 [GitHub](https://github.com/palakagrawal006)
