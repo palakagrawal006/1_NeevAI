@@ -10,6 +10,7 @@ import Pricing from './pages/Pricing';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailed from './pages/PaymentFailed';
 
+
 export const serverUrl = import.meta.env.VITE_SERVER_URL
 
 
