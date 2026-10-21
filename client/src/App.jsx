@@ -1,4 +1,4 @@
-import react , {useEffect} from 'react'
+import React , {useEffect} from 'react'
 import {Navigate , Route, Routes} from "react-router-dom"
 import Home from './pages/Home'
 import Auth from './pages/Auth'

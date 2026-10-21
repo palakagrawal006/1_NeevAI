@@ -49,3 +49,13 @@ export const downloadPdf = async (result)=>{
         throw new Error("PDF download failed")
     }
 }
+
+
+// Attach the JWT as a Bearer header to every axios request
+axios.interceptors.request.use((config) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+  } catch (e) {}
+  return config;
+});

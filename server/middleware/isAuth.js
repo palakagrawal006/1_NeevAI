@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 // middleware == next  ,, apply in middle of multiple routes/functions
 const isAuth = async(req, res , next) =>{
     try {
-        let {token} = req.cookies
+       let token = req.headers.authorization?.split(" ")[1] || req.cookies?.token
         if(!token){
             return res.status(400).json({message : "Token is not found"})
         }

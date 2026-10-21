@@ -24,7 +24,7 @@ export const googleAuth = async (req, res) =>{
 
         } )
 
-        return res.status(200).json(user) //ok
+        return res.status(200).json({ user, token }) //ok
     } catch (error) {
         return res.status(500).json({message : `googleSignup Error ${error}`})
     }
