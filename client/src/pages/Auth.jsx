@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
-import { signInWithRedirect  } from "firebase/auth";
+import { signInWithPopup  } from "firebase/auth";
 import {auth, provider} from "../utils/firebase.js";
 import axios from "axios"
 import { serverUrl } from './../App';
@@ -15,7 +15,7 @@ function Auth() {
   const handleGoogleAuth = async() => {
     try{
       // const response = await signInWithRedirect(auth , provider ) // by firebase
-      const response = await signInWithRedirect (auth , provider ) // by firebase
+      const response = await signInWithPopup (auth , provider ) // by firebase
 
       // console.log(response); 
     //   // This gives you a Google Access Token. You can use it to access the Google API.
