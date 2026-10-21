@@ -201,7 +201,7 @@ function Toggle({ label, checked, onChange }) {
         animate={{
           backgroundColor: checked ? "#22D3EE" : "#E2E8F0",
         }}
-        className="relative w-9 h-5 rounded-full flex-shrink-0"
+        className="relative w-9 h-5 rounded-full shrink-0"
       >
         <motion.div
           animate={{ x: checked ? 22 : 2 }}
