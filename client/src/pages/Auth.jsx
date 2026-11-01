@@ -1,7 +1,7 @@
-import React , {useState} from "react";
+import React , {useState, useEffect} from "react";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
-import { signInWithPopup  } from "firebase/auth";
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from "firebase/auth";
 import {auth, provider} from "../utils/firebase.js";
 import axios from "axios"
 import { serverUrl } from './../App';
@@ -14,50 +14,55 @@ function Auth() {
 
  const [loading, setLoading] = useState(false);
 
-const handleGoogleAuth = async () => {
-  if (loading) return;
-
-  try {
-    setLoading(true);
-
-    // Step 1: Firebase Google authentication
-    const response = await signInWithPopup(auth, provider);
-
-    const user = response.user;
-
-    // Step 2: Get Firebase ID token
-    const idToken = await user.getIdToken();
-
-    // Step 3: Send token to backend
+  // Sends the Google profile to our backend and stores the session
+  const finishLogin = async (user) => {
     const result = await axios.post(
-  `${serverUrl}/api/auth/google`,
-  { name: user.displayName, email: user.email },
-  { withCredentials: true }
-);
-    // Step 4: Save backend response
+      `${serverUrl}/api/auth/google`,
+      { name: user.displayName, email: user.email },
+      { withCredentials: true }
+    );
+
     if (result.data.token) {
       localStorage.setItem("token", result.data.token);
     }
-
     dispatch(setUserData(result.data.user));
+  };
 
-  } catch (err) {
-    console.error(
-      "Google Auth Failed:",
-      err.response?.data || err.message
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  // Completes login after coming back from the redirect flow
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((res) => (res?.user ? finishLogin(res.user) : null))
+      .catch((err) =>
+        console.error("Redirect login failed:", err.response?.data || err.message)
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  const handleGoogleAuth = async () => {
+    if (loading) return;
 
-
-
-
-
-
-
+    try {
+      setLoading(true);
+      // must be the first async call inside the click handler
+      const response = await signInWithPopup(auth, provider);
+      await finishLogin(response.user);
+    } catch (err) {
+      // popup blocked by browser/extension -> use redirect, which cannot be blocked
+      if (
+        err.code === "auth/popup-blocked" ||
+        err.code === "auth/operation-not-supported-in-this-environment"
+      ) {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+      if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") {
+        return;
+      }
+      console.error("Google Auth Failed:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 px-6 md:px-12 font-sans selection:bg-cyan-100">
