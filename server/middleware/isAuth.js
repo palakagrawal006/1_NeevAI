@@ -4,31 +4,27 @@ import cookieParser from "cookie-parser";
 import jwt from 'jsonwebtoken';
 // import { getToken } from './../utils/token';
 
+const isAuth = (req, res, next) => {
+  try {
+    const token =
+      req.headers.authorization?.split(" ")[1] || req.cookies?.token;
 
-// middleware == next  ,, apply in middle of multiple routes/functions
-const isAuth = async(req, res , next) =>{
-    try {
-       let token = req.headers.authorization?.split(" ")[1] || req.cookies?.token
-        if(!token){
-            return res.status(400).json({message : "Token is not found"})
-        }
-
-        //got token - verify through jwt
-        let verifyToken = jwt.verify(token , process.env.JWT_SECRET )
-        if(!verifyToken) {
-            return res.status(400).json({message : "User does not have valid token"})
-        }
-
-        // if verified getToken
-        req.userId = verifyToken.userId 
-        next()  
-        // after that controller is called
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
     }
-     catch (error) {
-       return res.status(500).json({ message: "Auth error", error: error.message });
 
+    // throws if invalid or expired
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
-}
+    return res.status(500).json({ message: "Auth error", error: error.message });
+  }
+};
 
-export default isAuth
+export default isAuth;
+
