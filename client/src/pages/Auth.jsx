@@ -1,4 +1,4 @@
-import React from "react";
+import React , {useState} from "react";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { signInWithPopup  } from "firebase/auth";
@@ -12,29 +12,45 @@ function Auth() {
 
   const dispatch = useDispatch()
 
-  const handleGoogleAuth = async() => {
-    try{
-      // const response = await signInWithRedirect(auth , provider ) // by firebase
-      const response = await signInWithPopup (auth , provider ) // by firebase
+ const [loading, setLoading] = useState(false);
 
-      // console.log(response); 
-    //   // This gives you a Google Access Token. You can use it to access the Google API.
-      const User = response.user 
-      const name = User.displayName 
-      const email = User.email 
+const handleGoogleAuth = async () => {
+  if (loading) return;
 
-      // send name and email to the "http:localhost:8000/api/auth/google"
-      const result = await axios.post(`${serverUrl}/api/auth/google`, {name , email},{ withCredentials:true})
+  try {
+    setLoading(true);
 
-      // console.log(result.data) //user 
-      if (result.data.token) localStorage.setItem("token", result.data.token)
-      dispatch(setUserData(result.data.user))
-    } 
-    catch(err){
-      console.error("Auth failed:", err.message || err.response?.data);
+    // Step 1: Firebase Google authentication
+    const response = await signInWithPopup(auth, provider);
+
+    const user = response.user;
+
+    // Step 2: Get Firebase ID token
+    const idToken = await user.getIdToken();
+
+    // Step 3: Send token to backend
+    const result = await axios.post(
+      `${serverUrl}/api/auth/google`,
+      { token: idToken },
+      { withCredentials: true }
+    );
+
+    // Step 4: Save backend response
+    if (result.data.token) {
+      localStorage.setItem("token", result.data.token);
     }
-  }
 
+    dispatch(setUserData(result.data.user));
+
+  } catch (err) {
+    console.error(
+      "Google Auth Failed:",
+      err.response?.data || err.message
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
@@ -87,11 +103,11 @@ function Auth() {
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
             className="mt-10 px-8 py-4 rounded-xl flex items-center gap-4 bg-[#16325B] text-white font-bold text-lg shadow-xl shadow-blue-900/20 hover:bg-[#1e447a] transition-all"
-           onClick={handleGoogleAuth}>
+           onClick={handleGoogleAuth} disabled={loading}>
             <div className="bg-white p-1 rounded-md">
               <FcGoogle size={22} />
             </div>
-            Continue with Google
+            {loading ? "Signing in..." : "Continue with Google"}
           </motion.button>
 
           <div className="mt-8 flex items-center gap-3 text-sm font-medium text-slate-500">
