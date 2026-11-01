@@ -1,5 +1,3 @@
-import cookieParser from "cookie-parser";
-
 
 import jwt from 'jsonwebtoken';
 // import { getToken } from './../utils/token';

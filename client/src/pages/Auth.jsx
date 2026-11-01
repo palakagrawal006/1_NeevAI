@@ -30,11 +30,10 @@ const handleGoogleAuth = async () => {
 
     // Step 3: Send token to backend
     const result = await axios.post(
-      `${serverUrl}/api/auth/google`,
-      { token: idToken },
-      { withCredentials: true }
-    );
-
+  `${serverUrl}/api/auth/google`,
+  { name: user.displayName, email: user.email },
+  { withCredentials: true }
+);
     // Step 4: Save backend response
     if (result.data.token) {
       localStorage.setItem("token", result.data.token);
